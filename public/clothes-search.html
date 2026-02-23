@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="icon" href="images/Logo.jpeg" type="image">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styleo • Clothes Search</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page-feature">
+  <div class="dash">
+
+    <!-- TOP NAV (logo left, functions center, username right) -->
+<header class="dash-header dash-header--nav">
+  <div class="dash-left">
+    <img class="dash-logo" src="images/Logo.jpeg" alt="Styleo Logo" />
+    <span class="dash-brand">Styleo</span>
+  </div>
+
+  <!-- NAV (центр) -->
+  <nav class="top-nav" aria-label="Feature navigation">
+    <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+
+    <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+    <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html">Outfit Builder</a>
+    <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+    <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html">Wardrobe</a>
+    <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html">3D Model</a>
+    <a class="top-nav__link" data-route="gemini_chat.html" href="gemini_chat.html">AI Stylist</a>
+    <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+
+    <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+  </nav>
+
+  <div class="dash-right">
+    <span class="dash-user" id="username">@user</span>
+  </div>
+</header>
+
+
+    <!-- TITLE -->
+    <main class="feature-shell">
+      <h1 class="feature-title feature-title--center">Clothes Search</h1>
+
+      <!-- TWO COLUMNS -->
+      <section class="cs-grid" aria-label="Clothes search">
+        <!-- LEFT: PHOTO SEARCH -->
+        <div class="cs-col">
+          <section class="cs-card">
+            <h2 class="cs-card__title">Photo Search</h2>
+
+            <div class="cs-actions">
+              <!-- hidden file input -->
+              <input id="photoFile" class="cs-hidden" type="file" accept="image/*" />
+
+              <button class="btn btn-outline cs-btn" type="button" id="photoAddBtn">Add</button>
+              <button class="btn btn-primary cs-btn" type="button" id="photoSearchBtn" disabled>Search</button>
+            </div>
+
+            <div class="cs-preview" id="photoPreview" aria-live="polite">
+              <div class="cs-preview__empty">No photo selected</div>
+            </div>
+
+            <p class="cs-hint">Search won’t run without a photo.</p>
+          </section>
+
+          <section class="cs-card cs-card--history" aria-label="Photo search history">
+            <div class="cs-card__head">
+              <h3 class="cs-card__title cs-card__title--sm">Photo Search History</h3>
+              <button class="cs-clear" type="button" id="clearPhotoHistory">Clear</button>
+            </div>
+
+            <div class="cs-history" id="photoHistory">
+              <!-- items injected by JS -->
+            </div>
+          </section>
+        </div>
+
+        <!-- RIGHT: TEXT SEARCH -->
+        <div class="cs-col">
+          <section class="cs-card">
+            <h2 class="cs-card__title">Text Search</h2>
+
+            <div class="cs-actions">
+              <button class="btn btn-outline cs-btn" type="button" id="textAddBtn">Add</button>
+              <button class="btn btn-primary cs-btn" type="button" id="textSearchBtn" disabled>Search</button>
+            </div>
+
+            <label class="cs-field">
+              <span class="cs-field__label">Describe desired clothing</span>
+              <input id="textQuery" class="cs-field__input" type="text" placeholder="e.g. dark green hoodie, beige trench coat..." />
+            </label>
+
+            <p class="cs-hint">Search won’t run without text.</p>
+          </section>
+
+          <section class="cs-card cs-card--history" aria-label="Text search history">
+            <div class="cs-card__head">
+              <h3 class="cs-card__title cs-card__title--sm">Text Search History</h3>
+              <button class="cs-clear" type="button" id="clearTextHistory">Clear</button>
+            </div>
+
+            <div class="cs-history" id="textHistory">
+              <!-- items injected by JS -->
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <!-- SUPPORT button bottom-left -->
+    <a class="support-fab" href="support.html" aria-label="Support">
+      <span class="support-fab__dot">?</span>
+      <span class="support-fab__text">Support</span>
+    </a>
+
+  </div>
+
+  <script>
+    // ---- helpers
+    const qs = (s) => document.querySelector(s);
+    const fmtDate = (d) =>
+      new Intl.DateTimeFormat(undefined, { year:'numeric', month:'short', day:'2-digit' }).format(d);
+
+    // ---- username + keep ?user=... on navigation
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const user = params.get("user");
+
+      const u = qs("#username");
+      if (user && u) u.textContent = "@" + user;
+
+      if (user) {
+        document.querySelectorAll("a[data-route], a.keep-user").forEach(a => {
+          const url = new URL(a.getAttribute("href"), window.location.origin);
+          url.searchParams.set("user", user);
+          a.setAttribute("href", url.pathname + "?" + url.searchParams.toString());
+        });
+      }
+
+      initClothesSearch();
+    });
+
+    function initClothesSearch(){
+      // DOM
+      const photoFile = qs("#photoFile");
+      const photoAddBtn = qs("#photoAddBtn");
+      const photoSearchBtn = qs("#photoSearchBtn");
+      const photoPreview = qs("#photoPreview");
+      const photoHistoryEl = qs("#photoHistory");
+      const clearPhotoHistory = qs("#clearPhotoHistory");
+
+      const textAddBtn = qs("#textAddBtn");
+      const textSearchBtn = qs("#textSearchBtn");
+      const textQuery = qs("#textQuery");
+      const textHistoryEl = qs("#textHistory");
+      const clearTextHistory = qs("#clearTextHistory");
+
+      // storage keys
+      const K_PHOTO = "styleo_photo_history_v1";
+      const K_TEXT  = "styleo_text_history_v1";
+
+      // state
+      let selectedPhotoDataUrl = "";
+
+      // load history
+      const photoHistory = safeParse(localStorage.getItem(K_PHOTO)) || [];
+      const textHistory  = safeParse(localStorage.getItem(K_TEXT)) || [];
+      renderPhotoHistory(photoHistoryEl, photoHistory);
+      renderTextHistory(textHistoryEl, textHistory);
+
+      // PHOTO: Add -> open file picker
+      photoAddBtn.addEventListener("click", () => photoFile.click());
+
+      // PHOTO: on select -> enable Search + show preview
+      photoFile.addEventListener("change", async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        selectedPhotoDataUrl = await fileToDataURL(file);
+        photoSearchBtn.disabled = false;
+
+        photoPreview.innerHTML = `
+          <img class="cs-preview__img" src="${selectedPhotoDataUrl}" alt="Selected photo preview">
+        `;
+      });
+
+      // PHOTO: Search -> requires photo
+      photoSearchBtn.addEventListener("click", async () => {
+        if (!selectedPhotoDataUrl) return;
+
+        photoSearchBtn.disabled = true;
+        photoSearchBtn.textContent = "Searching...";
+
+        try {
+          // Convert data URL to blob
+          const response = await fetch(selectedPhotoDataUrl);
+          const blob = await response.blob();
+          
+          const formData = new FormData();
+          formData.append("image", blob, "photo.jpg");
+
+          console.log("🔍 Attempting photo search...");
+          
+          let apiResponse;
+          let apiUrl = "http://localhost:3001/api/photo-search";
+          let lastError = null;
+          
+          // Try localhost:3001 first
+          try {
+            console.log("📡 Trying:", apiUrl);
+            apiResponse = await fetch(apiUrl, {
+              method: "POST",
+              body: formData
+            });
+            console.log("✅ Connected to localhost:3001, response status:", apiResponse.status);
+          } catch (e) {
+            console.log("❌ Failed to connect to localhost:3001:", e.message);
+            lastError = e;
+            // If that fails, try relative URL (for Firebase)
+            apiUrl = "/api/photo-search";
+            try {
+              console.log("📡 Trying relative path:", apiUrl);
+              apiResponse = await fetch(apiUrl, {
+                method: "POST",
+                body: formData
+              });
+              console.log("✅ Connected to relative URL, response status:", apiResponse.status);
+            } catch (e2) {
+              console.log("❌ Failed to connect to relative URL:", e2.message);
+              throw new Error("Could not reach backend API. Tried:\n1. http://localhost:3001/api/photo-search\n2. /api/photo-search\n\nMake sure Ghast has started the backend with 'npm start' in the server folder.");
+            }
+          }
+
+          if (!apiResponse.ok) {
+            const responseText = await apiResponse.text();
+            console.log("❌ API Error Response:", responseText);
+            try {
+              const error = JSON.parse(responseText);
+              throw new Error(error.error || `HTTP ${apiResponse.status}`);
+            } catch (e) {
+              throw new Error(`Server returned ${apiResponse.status}: ${responseText.substring(0, 100)}`);
+            }
+          }
+
+          const data = await apiResponse.json();
+          console.log("✅ Search successful:", data);
+          
+          // Store in history
+          const item = {
+            date: new Date().toISOString(),
+            img: selectedPhotoDataUrl,
+            results: data.results || []
+          };
+
+          photoHistory.unshift(item);
+          localStorage.setItem(K_PHOTO, JSON.stringify(photoHistory));
+          renderPhotoHistory(photoHistoryEl, photoHistory);
+
+          // Show results
+          showPhotoSearchResults(data);
+        } catch (e) {
+          console.error("Photo search error:", e);
+          alert("Error: " + e.message + "\n\nMake sure the backend server is running on http://localhost:3001");
+        } finally {
+          photoSearchBtn.disabled = false;
+          photoSearchBtn.textContent = "Search";
+        }
+      });
+
+      clearPhotoHistory.addEventListener("click", () => {
+        photoHistory.length = 0;
+        localStorage.setItem(K_PHOTO, JSON.stringify(photoHistory));
+        renderPhotoHistory(photoHistoryEl, photoHistory);
+      });
+
+      // TEXT: Add -> focus input (and optionally clear)
+      textAddBtn.addEventListener("click", () => {
+        textQuery.focus();
+        // optional: textQuery.value = "";
+        updateTextBtn();
+      });
+
+      // TEXT: enable Search only if non-empty
+      function updateTextBtn(){
+        textSearchBtn.disabled = !textQuery.value.trim();
+      }
+      textQuery.addEventListener("input", updateTextBtn);
+      updateTextBtn();
+
+      // TEXT: Search -> requires text
+      textSearchBtn.addEventListener("click", async () => {
+        const q = textQuery.value.trim();
+        if (!q) return;
+
+        textSearchBtn.disabled = true;
+        textSearchBtn.textContent = "Searching...";
+
+        try {
+          console.log("🔍 Attempting text search for:", q);
+          
+          // live share stuff
+          let apiResponse;
+          let apiUrl = "http://localhost:3001/api/text-search";
+          let lastError = null;
+          
+          // Try localhost:3001
+          try {
+            console.log("📡 Trying:", apiUrl);
+            apiResponse = await fetch(apiUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ query: q })
+            });
+            console.log("✅ Connected to localhost:3001, response status:", apiResponse.status);
+          } catch (e) {
+            console.log("❌ Failed to connect to localhost:3001:", e.message);
+            lastError = e;
+            //  try relative URL ( Firebase)
+            apiUrl = "/api/text-search";
+            try {
+              console.log("📡 Trying relative path:", apiUrl);
+              apiResponse = await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: q })
+              });
+              console.log("✅ Connected to relative URL, response status:", apiResponse.status);
+            } catch (e2) {
+              console.log("❌ Failed to connect to relative URL:", e2.message);
+              throw new Error("Could not reach backend API. Tried:\n1. http://localhost:3001/api/text-search\n2. /api/text-search\n\nMake sure Ghast has started the backend with 'npm start' in the server folder.");
+            }
+          }
+
+          if (!apiResponse.ok) {
+            const responseText = await apiResponse.text();
+            console.log("❌ API Error Response:", responseText);
+            try {
+              const error = JSON.parse(responseText);
+              throw new Error(error.error || `HTTP ${apiResponse.status}`);
+            } catch (e) {
+              throw new Error(`Server returned ${apiResponse.status}: ${responseText.substring(0, 100)}`);
+            }
+          }
+
+          const data = await apiResponse.json();
+          console.log("✅ Search successful:", data);
+
+          // Store  history
+          const item = {
+            date: new Date().toISOString(),
+            text: q,
+            results: data.results || []
+          };
+
+          textHistory.unshift(item);
+          localStorage.setItem(K_TEXT, JSON.stringify(textHistory));
+          renderTextHistory(textHistoryEl, textHistory);
+
+          // Show results
+          showTextSearchResults(data);
+        } catch (e) {
+          console.error("Text search error:", e);
+          alert("Error: " + e.message + "\n\nMake sure the backend server is running on http://localhost:3001");
+        } finally {
+          textSearchBtn.disabled = false;
+          textSearchBtn.textContent = "Search";
+        }
+      });
+
+      clearTextHistory.addEventListener("click", () => {
+        textHistory.length = 0;
+        localStorage.setItem(K_TEXT, JSON.stringify(textHistory));
+        renderTextHistory(textHistoryEl, textHistory);
+      });
+    }
+
+    function renderPhotoHistory(root, items){
+      if (!items.length){
+        root.innerHTML = `<div class="cs-empty">No history yet</div>`;
+        return;
+      }
+      root.innerHTML = items.map((it, idx) => `
+        <article class="cs-hitem" aria-label="Photo history item ${idx+1}">
+          <div class="cs-hitem__date">${fmtDate(new Date(it.date))}</div>
+          <img class="cs-hitem__img" src="${it.img}" alt="Uploaded photo on ${fmtDate(new Date(it.date))}">
+        </article>
+      `).join("");
+    }
+
+    function renderTextHistory(root, items){
+      if (!items.length){
+        root.innerHTML = `<div class="cs-empty">No history yet</div>`;
+        return;
+      }
+      root.innerHTML = items.map((it, idx) => `
+        <article class="cs-hitem" aria-label="Text history item ${idx+1}">
+          <div class="cs-hitem__date">${fmtDate(new Date(it.date))}</div>
+          <div class="cs-hitem__text">${escapeHTML(it.text)}</div>
+        </article>
+      `).join("");
+    }
+
+    function safeParse(v){
+      try { return JSON.parse(v); } catch { return null; }
+    }
+    function fileToDataURL(file){
+      return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result);
+        r.onerror = rej;
+        r.readAsDataURL(file);
+      });
+    }
+    function escapeHTML(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // show search results
+    function showPhotoSearchResults(data) {
+      let resultsHTML = "<div class='search-results-modal'>";
+      
+      if (data.results && data.results.length > 0) {
+        resultsHTML += `<h3>Found ${data.results.length} matching items</h3>`;
+        resultsHTML += `<p><small>Image analyzed: ${escapeHTML(data.imageDescription || "clothing item")}</small></p>`;
+        resultsHTML += "<div class='results-list'>";
+        
+        data.results.forEach(item => {
+          resultsHTML += `
+            <div class="result-item" style="border: 1px solid #ddd; padding: 12px; margin: 8px 0; border-radius: 4px;">
+              <h4 style="margin: 0 0 8px 0;">${escapeHTML(item.name)}</h4>
+              <p style="margin: 4px 0;"><strong>Brand:</strong> ${escapeHTML(item.brand)}</p>
+              <p style="margin: 4px 0;"><strong>Color:</strong> ${escapeHTML(item.color)} | <strong>Type:</strong> ${escapeHTML(item.type)}</p>
+              <p style="margin: 4px 0;"><strong>Price:</strong> $${item.price}</p>
+              <a href="${escapeHTML(item.url)}" target="_blank" class="btn btn-primary" style="margin-top: 8px; display: inline-block;">View Item</a>
+            </div>
+          `;
+        });
+        
+        resultsHTML += "</div>";
+      } else {
+        resultsHTML += "<p>No matching items found for this image.</p>";
+      }
+      
+      resultsHTML += "</div>";
+      
+      // alert-display
+      alert(resultsHTML.replace(/<[^>]*>/g, "\n") + "\n\n(Open browser console or check the full interface for formatted results)");
+    }
+
+    function showTextSearchResults(data) {
+      let resultsHTML = "<div class='search-results-modal'>";
+      
+      if (data.results && data.results.length > 0) {
+        resultsHTML += `<h3>Found ${data.results.length} items for "${escapeHTML(data.query)}"</h3>`;
+        resultsHTML += "<div class='results-list'>";
+        
+        data.results.forEach(item => {
+          resultsHTML += `
+            <div class="result-item" style="border: 1px solid #ddd; padding: 12px; margin: 8px 0; border-radius: 4px;">
+              <h4 style="margin: 0 0 8px 0;">${escapeHTML(item.name)}</h4>
+              <p style="margin: 4px 0;"><strong>Brand:</strong> ${escapeHTML(item.brand)}</p>
+              <p style="margin: 4px 0;"><strong>Color:</strong> ${escapeHTML(item.color)} | <strong>Type:</strong> ${escapeHTML(item.type)}</p>
+              <p style="margin: 4px 0;"><strong>Price:</strong> $${item.price}</p>
+              <a href="${escapeHTML(item.url)}" target="_blank" class="btn btn-primary" style="margin-top: 8px; display: inline-block;">View Item</a>
+            </div>
+          `;
+        });
+        
+        resultsHTML += "</div>";
+      } else {
+        resultsHTML += `<p>No items found matching "${escapeHTML(data.query)}".</p>`;
+      }
+      
+      resultsHTML += "</div>";
+      
+      alert(resultsHTML.replace(/<[^>]*>/g, "\n") + "\n\n(Open browser console or check the full interface for formatted results)");
+    }
+  </script>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const user = params.get("user");
+
+    // 1) username
+    const el = document.getElementById("username");
+    if (el && user) el.textContent = "@" + user;
+
+    // 2) 
+    if (user) {
+      document.querySelectorAll("a[data-route]").forEach(a => {
+        const url = new URL(a.getAttribute("href"), window.location.origin);
+        url.searchParams.set("user", user);
+        a.setAttribute("href", url.pathname + "?" + url.searchParams.toString());
+      });
+    }
+
+    // 3) highlight current page 
+    const current = location.pathname.split("/").pop() || "dashboard.html";
+    document.querySelectorAll("a[data-route]").forEach(a => {
+      const route = a.getAttribute("data-route");
+      if (route === current) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+  });
+</script>
+<!-- твой HTML выше -->
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const photoFile = document.getElementById("photoFile");
+  const photoAddBtn = document.getElementById("photoAddBtn");
+
+  if (!photoFile || !photoAddBtn) return;
+
+  photoAddBtn.addEventListener("click", () => {
+    photoFile.click();
+  });
+});
+</script>
+<script src="applyTheme.js"></script></body>
+<!-- это все сломано' -->
+</html>

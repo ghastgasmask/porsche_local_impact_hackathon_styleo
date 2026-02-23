@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="icon" href="images/Logo.jpeg" type="image">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styleo • Wardrobe</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page-feature">
+<div class="dash">
+
+  <!-- THE FINAL GLOBAL HEADER -->
+  <header class="dash-header dash-header--nav">
+    <div class="dash-left">
+      <img class="dash-logo" src="images/Logo.jpeg" alt="Styleo Logo" />
+      <span class="dash-brand">Styleo</span>
+    </div>
+
+    <nav class="top-nav" aria-label="Feature navigation">
+      <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+      <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+      <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html">Outfit Builder</a>
+      <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+      <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html" aria-current="page">Wardrobe</a>
+      <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html">3D Model</a>
+      <a class="top-nav__link" data-route="gemini_chat.html" href="gemini_chat.html">AI Stylist</a>
+      <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+      <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+    </nav>
+
+    <div class="dash-right">
+      <span class="dash-user" id="username">@user</span>
+    </div>
+  </header>
+
+  <main class="feature-shell">
+    <h1 class="feature-title feature-title--center">Digital Wardrobe</h1>
+    <p class="wd-sub">In your closet</p>
+
+    <section class="wd-layout" aria-label="Wardrobe layout">
+      <!-- recent activity -->
+      <aside class="wd-card wd-left">
+        <div class="wd-card__head">
+          <h2 class="wd-card__title">Recent activity</h2>
+          <button class="wd-mini" type="button" id="clearActivity">Clear</button>
+        </div>
+        <div class="wd-activity" id="activityList"></div>
+      </aside>
+
+      <!-- CENTER: add photo i grid -->
+      <section class="wd-card wd-center">
+        <div class="wd-add">
+          <div class="wd-add__left">
+            <h2 class="wd-card__title">Add photo</h2>
+            <p class="wd-muted">Upload clothing photo and tag it (required).</p>
+
+            <div class="wd-actions">
+              <button class="btn btn-outline" type="button" id="addPhotoBtn">Add</button>
+              <button class="btn btn-primary" type="button" id="saveBtn" disabled>Save to wardrobe</button>
+              <input id="fileInput" type="file" accept="image/*" hidden />
+            </div>
+
+            <div class="wd-tags">
+              <label class="wd-field">
+                <span>Type *</span>
+                <select id="tagType">
+                  <option value="">Select</option>
+                  <option>tshirt</option>
+                  <option>hoodie</option>
+                  <option>jacket</option>
+                  <option>pants</option>
+                  <option>shorts</option>
+                  <option>shoes</option>
+                  <option>accessory</option>
+                </select>
+              </label>
+
+              <label class="wd-field">
+                <span>Color *</span>
+                <select id="tagColor">
+                  <option value="">Select</option>
+                  <option>black</option>
+                  <option>white</option>
+                  <option>gray</option>
+                  <option>green</option>
+                  <option>beige</option>
+                  <option>brown</option>
+                  <option>blue</option>
+                  <option>red</option>
+                </select>
+              </label>
+
+              <label class="wd-field">
+                <span>Season *</span>
+                <select id="tagSeason">
+                  <option value="">Select</option>
+                  <option>summer</option>
+                  <option>spring</option>
+                  <option>autumn</option>
+                  <option>winter</option>
+                </select>
+              </label>
+
+              <label class="wd-field">
+                <span>Style *</span>
+                <select id="tagStyle">
+                  <option value="">Select</option>
+                  <option>casual</option>
+                  <option>streetwear</option>
+                  <option>classic</option>
+                  <option>sport</option>
+                  <option>formal</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="wd-required" id="requiredNote">
+              All 4 tags are required to save.
+            </div>
+          </div>
+
+          <div class="wd-add__right">
+            <div class="wd-preview" id="previewBox">
+              <div class="wd-preview__empty">Preview</div>
+              <img id="previewImg" alt="Preview" />
+            </div>
+            <div class="wd-meta" id="fileMeta"></div>
+          </div>
+        </div>
+
+        <hr class="wd-divider" />
+
+        <div class="wd-grid" id="wardrobeGrid" aria-label="Wardrobe items"></div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Support -->
+  <a class="support-fab keep-user" href="support.html" aria-label="Support">
+    <span class="support-fab__dot">?</span>
+    <span class="support-fab__text">Support</span>
+  </a>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const user = params.get("user") || "";
+  const u = document.getElementById("username");
+  if (u && user) u.textContent = "@" + user;
+
+  // keep user 
+  if (user) {
+    document.querySelectorAll("a[data-route], a.keep-user").forEach(a => {
+      const url = new URL(a.getAttribute("href"), window.location.origin);
+      url.searchParams.set("user", user);
+      a.setAttribute("href", url.pathname + "?" + url.searchParams.toString());
+    });
+  }
+
+  // highlight current
+  const current = location.pathname.split("/").pop() || "dashboard.html";
+  document.querySelectorAll("a[data-route]").forEach(a => {
+    if (a.getAttribute("data-route") === current) a.setAttribute("aria-current","page");
+    else a.removeAttribute("aria-current");
+  });
+
+  initWardrobe();
+});
+
+function initWardrobe(){
+  const K_ITEMS = "styleo_wardrobe_items_v1";
+  const K_ACTIVITY = "styleo_wardrobe_activity_v1";
+
+  const addBtn = document.getElementById("addPhotoBtn");
+  const saveBtn = document.getElementById("saveBtn");
+  const fileInput = document.getElementById("fileInput");
+  const previewImg = document.getElementById("previewImg");
+  const previewBox = document.getElementById("previewBox");
+  const fileMeta = document.getElementById("fileMeta");
+
+  const tagType = document.getElementById("tagType");
+  const tagColor = document.getElementById("tagColor");
+  const tagSeason = document.getElementById("tagSeason");
+  const tagStyle = document.getElementById("tagStyle");
+  const requiredNote = document.getElementById("requiredNote");
+
+  const grid = document.getElementById("wardrobeGrid");
+  const activityList = document.getElementById("activityList");
+  const clearActivity = document.getElementById("clearActivity");
+
+  let items = safeParse(localStorage.getItem(K_ITEMS)) || [];
+  let activity = safeParse(localStorage.getItem(K_ACTIVITY)) || [];
+  let pending = { dataUrl: "", filename: "" };
+
+  renderGrid();
+  renderActivity();
+  syncSaveEnabled();
+
+  addBtn.addEventListener("click", () => fileInput.click());
+
+  fileInput.addEventListener("change", async () => {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+
+    pending.filename = f.name;
+    pending.dataUrl = await fileToDataURL(f);
+
+    previewImg.src = pending.dataUrl;
+    previewImg.style.display = "block";
+    previewBox.classList.add("wd-preview--has");
+    fileMeta.textContent = f.name;
+
+    // reset tags? (не трогаем, но можно)
+    syncSaveEnabled();
+  });
+
+  [tagType, tagColor, tagSeason, tagStyle].forEach(el => {
+    el.addEventListener("change", syncSaveEnabled);
+  });
+
+  saveBtn.addEventListener("click", () => {
+    if (!canSave()) return;
+
+    const now = new Date();
+    const id = "w_" + now.getTime().toString(36);
+
+    const newItem = {
+      id,
+      img: pending.dataUrl,
+      filename: pending.filename,
+      type: tagType.value,
+      color: tagColor.value,
+      season: tagSeason.value,
+      style: tagStyle.value,
+      createdAt: now.toISOString()
+    };
+
+    items.unshift(newItem);
+    localStorage.setItem(K_ITEMS, JSON.stringify(items));
+
+    activity.unshift({
+      ts: now.toISOString(),
+      text: `Added: ${pending.filename} (${newItem.type}/${newItem.color}/${newItem.season}/${newItem.style})`
+    });
+    activity = activity.slice(0, 20);
+    localStorage.setItem(K_ACTIVITY, JSON.stringify(activity));
+
+    // clear pending
+    pending = { dataUrl:"", filename:"" };
+    fileInput.value = "";
+    previewImg.src = "";
+    previewImg.style.display = "none";
+    previewBox.classList.remove("wd-preview--has");
+    fileMeta.textContent = "";
+    [tagType, tagColor, tagSeason, tagStyle].forEach(el => el.value = "");
+
+    renderGrid();
+    renderActivity();
+    syncSaveEnabled();
+  });
+
+  clearActivity.addEventListener("click", () => {
+    activity = [];
+    localStorage.setItem(K_ACTIVITY, JSON.stringify(activity));
+    renderActivity();
+  });
+
+  function canSave(){
+    return !!pending.dataUrl && tagType.value && tagColor.value && tagSeason.value && tagStyle.value;
+  }
+
+  function syncSaveEnabled(){
+    const ok = canSave();
+    saveBtn.disabled = !ok;
+    requiredNote.style.opacity = ok ? "0.5" : "1";
+    requiredNote.textContent = ok ? "Ready to save." : "All 4 tags are required to save.";
+  }
+
+  function renderGrid(){
+    if (!items.length){
+      grid.innerHTML = `<div class="wd-empty">No items yet. Add your first photo 👆</div>`;
+      return;
+    }
+    grid.innerHTML = items.map(it => `
+      <article class="wd-item" data-id="${it.id}">
+        <div class="wd-item__thumb">
+          <img src="${it.img}" alt="${escapeHTML(it.type)}">
+        </div>
+        <div class="wd-item__meta">
+          <div class="wd-item__top">
+            <span class="wd-badge">${escapeHTML(it.type)}</span>
+            <button class="wd-del" type="button" aria-label="Delete">×</button>
+          </div>
+          <div class="wd-item__tags">
+            <span>${escapeHTML(it.color)}</span>
+            <span>${escapeHTML(it.season)}</span>
+            <span>${escapeHTML(it.style)}</span>
+          </div>
+        </div>
+      </article>
+    `).join("");
+
+    grid.querySelectorAll(".wd-item").forEach(card => {
+      const id = card.getAttribute("data-id");
+      card.querySelector(".wd-del").addEventListener("click", (e) => {
+        e.stopPropagation();
+        items = items.filter(x => x.id !== id);
+        localStorage.setItem(K_ITEMS, JSON.stringify(items));
+        renderGrid();
+      });
+    });
+  }
+
+  function renderActivity(){
+    if (!activity.length){
+      activityList.innerHTML = `<div class="wd-empty">No activity yet.</div>`;
+      return;
+    }
+    activityList.innerHTML = activity.map(a => `
+      <div class="wd-act">
+        <div class="wd-act__date">${formatDate(a.ts)}</div>
+        <div class="wd-act__text">${escapeHTML(a.text)}</div>
+      </div>
+    `).join("");
+  }
+}
+
+function fileToDataURL(file){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+function safeParse(v){ try { return JSON.parse(v); } catch { return null; } }
+function escapeHTML(str){
+  return String(str)
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+function formatDate(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleDateString() + " " + d.toLocaleTimeString().slice(0,5);
+  }catch{ return iso; }
+}
+</script>
+<script src="applyTheme.js"></script>
+</body>
+</html>

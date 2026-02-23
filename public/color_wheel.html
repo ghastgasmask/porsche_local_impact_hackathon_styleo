@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Styleo • Theme Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="page-feature">
+<div class="dash">
+
+  <header class="dash-header dash-header--nav">
+    <div class="dash-left">
+      <span class="dash-brand">Styleo</span>
+    </div>
+    <nav class="top-nav">
+      <a class="top-nav__link" href="dashboard.html">Dashboard</a>
+      <a class="top-nav__link" href="color_wheel.html" aria-current="page">Theme</a>
+      <a class="top-nav__link" href="color_wheel.html">Theme</a>
+    </nav>
+  </header>
+
+  <main class="feature-shell">
+    <h1 class="feature-title feature-title--center">Color Scheme Editor</h1>
+
+    <section class="theme-editor">
+      <div class="theme-card">
+        <label>Primary Color</label>
+        <input type="color" id="primaryPicker">
+      </div>
+
+      <div class="theme-card">
+        <label>Secondary Color</label>
+        <input type="color" id="secondaryPicker">
+      </div>
+
+      <button class="theme-reset" id="resetTheme">Reset to Default</button>
+    </section>
+  </main>
+
+</div>
+
+<script src="applyTheme.js"></script>
+
+<script>
+const root = document.documentElement;
+
+const primaryInput = document.getElementById("primaryPicker");
+const secondaryInput = document.getElementById("secondaryPicker");
+const resetBtn = document.getElementById("resetTheme");
+
+// load  values
+primaryInput.value =
+  getComputedStyle(root).getPropertyValue("--bg-color").trim();
+
+secondaryInput.value =
+  getComputedStyle(root).getPropertyValue("--accent-color").trim();
+
+primaryInput.addEventListener("input", e => {
+  localStorage.setItem("styleo_primary", e.target.value);
+  location.reload(); 
+});
+
+secondaryInput.addEventListener("input", e => {
+  localStorage.setItem("styleo_secondary", e.target.value);
+  location.reload();
+});
+
+
+resetBtn.addEventListener("click", () => {
+  localStorage.removeItem("styleo_primary");
+  localStorage.removeItem("styleo_secondary");
+  location.reload();
+});
+</script>
+
+<style>
+.theme-editor{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:20px;
+  max-width:600px;
+  margin:0 auto;
+}
+
+.theme-card{
+  background: var(--bg-card);
+  padding:20px;
+  border-radius:16px;
+  border:1px solid var(--border-soft);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.theme-card label{
+  color: var(--text-muted);
+}
+
+.theme-reset{
+  grid-column: 1 / -1;
+  padding:12px;
+  border-radius:14px;
+  background: var(--primary);
+  color:black;
+  font-weight:600;
+  border:none;
+  cursor:pointer;
+}
+</style>
+
+</body>
+</html>

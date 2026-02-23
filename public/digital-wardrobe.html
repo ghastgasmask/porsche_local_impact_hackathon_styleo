@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Wardrobe | Styleo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent-color: #4A90E2;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --border-color: #E1E8ED;
+            --hover-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-img {
+            width: 32px;
+            height: 32px;
+            background-color: var(--accent-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .user-info {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* PAGE TITLE */
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* WARDROBE GRID */
+        .wardrobe-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* ADD CLOTHING CARD */
+        .add-item-card {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: var(--bg-secondary);
+            min-height: 280px;
+        }
+
+        .add-item-card:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(74, 144, 226, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .add-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .add-item-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* CLOTHING CARD */
+        .clothing-card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .clothing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--accent-color);
+        }
+
+        .clothing-image {
+            width: 100%;
+            height: 220px;
+            background-color: var(--bg-secondary);
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Remove placeholder styles when image is loaded */
+        .clothing-image[style*="background-image"]::before,
+        .clothing-image[style*="background-image"]::after {
+            display: none;
+        }
+
+        .clothing-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .clothing-image::after {
+            content: 'Image Placeholder';
+            position: absolute;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .clothing-info {
+            padding: 1.25rem;
+        }
+
+        .clothing-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .clothing-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .tag.category {
+            background-color: rgba(74, 144, 226, 0.1);
+            color: var(--accent-color);
+            border-color: rgba(74, 144, 226, 0.2);
+        }
+
+        .tag.color {
+            background-color: rgba(155, 89, 182, 0.1);
+            color: #9B59B6;
+            border-color: rgba(155, 89, 182, 0.2);
+        }
+
+        .tag.season {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #F1C40F;
+            border-color: rgba(241, 196, 15, 0.2);
+        }
+
+        /* TAGGING EXPLANATION */
+        .tagging-explanation {
+            background-color: var(--bg-secondary);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .tagging-explanation h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .tagging-explanation p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* FOOTER */
+        footer {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        /*  */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 1.5rem;
+            }
+
+            .logo-text {
+                font-size: 1.25rem;
+            }
+
+            .user-info {
+                font-size: 0.85rem;
+            }
+
+            main {
+                padding: 2rem 1.5rem;
+            }
+
+            .page-title h1 {
+                font-size: 2rem;
+            }
+
+            .page-title p {
+                font-size: 1rem;
+            }
+
+            .wardrobe-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .add-item-card {
+                min-height: 200px;
+                padding: 2rem 1.5rem;
+            }
+
+            .add-icon {
+                font-size: 2.5rem;
+            }
+
+            .tagging-explanation {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .tagging-explanation h2 {
+                font-size: 1.1rem;
+            }
+
+            .tagging-explanation p {
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+
+            .clothing-image {
+                height: 180px;
+            }
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: var(--bg-primary);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-size: 1.75rem;
+        }
+
+        /* AUTH MODAL */
+        .auth-container {
+            margin-top: 1rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .auth-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            margin-bottom: -2px;
+        }
+
+        .auth-tab.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+
+        .auth-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .content label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .modal-content input[type="text"],
+        .modal-content input[type="email"],
+        .modal-content input[type="password"],
+        .modal-content input[type="file"],
+        .modal-content select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-content input:focus,
+        .modal-content select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .auth-submit-btn,
+        .submit-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .auth-submit-btn:hover,
+        .submit-btn:hover {
+            background-color: #357ABD;
+        }
+
+        .auth-submit-btn:disabled,
+        .submit-btn:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .cancel-btn {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background-color: var(--border-color);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-buttons .submit-btn {
+            flex: 1;
+        }
+
+        .form-buttons .cancel-btn {
+            flex: 1;
+        }
+
+        .error-message {
+            background-color: #FEE;
+            color: #C33;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            border: 1px solid #FCC;
+        }
+
+        #image-preview img {
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 10% auto;
+                padding: 1.5rem;
+                width: 95%;
+            }
+
+            .auth-tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .auth-tab {
+                text-align: left;
+                padding: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <!-- Replace with actual logo.png pls -->
+            <div class="logo-img">S</div>
+            <span class="logo-text">Styleo</span>
+        </div>
+        <div class="user-info">
+            @username
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- PAGE TITLE -->
+        <section class="page-title">
+            <h1>Your Digital Wardrobe</h1>
+            <p>Upload and tag your clothing items to build your personal AI-powered wardrobe</p>
+        </section>
+
+        <!-- WARDROBE ????????????????????????????????????????????????????????????????????????????????????????????? -->
+        <section class="wardrobe-grid">
+
+            <div class="add-item-card">
+                <div class="add-icon">+</div>
+                <p>Add Clothing Item</p>
+            </div>
+        </section>
+
+        <!-- TAGGING EXPLANATION -->
+        <section class="tagging-explanation">
+            <h2>About Tagging</h2>
+            <p>All clothing items must be tagged. Tags are used as the main data source for AI outfit generation. Each item requires a Category (Top, Bottom, Shoes, or Accessories), Color, and Season tag to ensure accurate outfit recommendations.</p>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        Styleo © 2026 — Digital Wardrobe
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <!-- IMPORTANT: Load in this order!!!!! -->
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="wardrobe-service.js"></script>
+    <script src="ui-modals.js"></script>
+    <script src="app.js"></script>
+    <script src="applyTheme.js"></script>
+
+<script src="applyTheme.js"></script></body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trends • Styleo</title>
+
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="assets/css/theme.css" />
+
+<!-- Pinterest  script -->
+<script async defer src="https://assets.pinterest.com/js/pinit.js"></script>
+
+<script>
+(() => {
+  try {
+    const mode = localStorage.getItem("themeMode") || "dark";
+    document.documentElement.setAttribute("data-theme", mode);
+  } catch(e) {}
+})();
+</script>
+
+<link rel="stylesheet" href="assets/css/theme.css">
+<link rel="stylesheet" href="style.css">
+
+
+</head>
+<script defer src="assets/js/theme.js"></script>
+<body class="page-trends">
+
+<!-- HEADER (тот же, что и в других страницах) -->
+<header class="dash-header dash-header--nav">
+  <div class="dash-left">
+    <img class="dash-logo" src="images/Logo.jpeg" />
+    <span class="dash-brand">Styleo</span>
+  </div>
+
+       <nav class="top-nav" aria-label="Feature navigation">
+        <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+        <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+        <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html">Outfit Builder</a>
+        <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+        <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html">Wardrobe</a>
+        <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html">3D Model</a>
+        <a class="top-nav__link" data-route="gemini_chat.html" href="gemini_chat.html" aria-current="page">AI Stylist</a>
+        <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+        <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+      </nav>
+  <div class="dash-right">@user</div>
+</header>
+
+<main class="trends">
+
+  <section class="trends-hero">
+    <h1>Trending Looks</h1>
+    <p>Explore the hottest outfits and buy every item separately</p>
+  </section>
+
+  <!-- PINTEREST SCRIPT SCRIPT -->
+<section class="trends-feed">
+  <a 
+    data-pin-do="embedBoard"
+    data-pin-board-width="1100"
+    data-pin-scale-height="600"
+    data-pin-scale-width="115"
+    href="https://www.pinterest.com/pinterest/fashion/">
+  </a>
+</section>
+
+
+</main>
+
+<!-- Theme widget (у тебя уже есть рустем) -->
+<div class="theme-widget" data-theme-widget>
+  <button class="theme-fab" data-theme-toggle>☀️</button>
+  <div class="theme-pop" data-theme-pop hidden></div>
+</div>
+
+<script defer src="assets/js/theme.js"></script>
+<script src="applyTheme.js"></script>
+</body>
+</html>

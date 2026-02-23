@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="images/Logo.jpeg" type="image">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styleo • AI Stylist</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!--CSS HERE -->
+  <link rel="stylesheet" href="gemini_chat.css">
+  <!-- styleo (pochti kak "style" po suti))-->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page-feature">
+  <div class="dash">
+
+    <!-- GLOBAL HEADER -->
+    <header class="dash-header dash-header--nav">
+      <div class="dash-left">
+        <img class="dash-logo" src="images/Logo.jpeg" alt="Styleo Logo" />
+        <span class="dash-brand">Styleo</span>
+      </div>
+
+      <nav class="top-nav" aria-label="Feature navigation">
+        <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+        <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+        <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html">Outfit Builder</a>
+        <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+        <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html">Wardrobe</a>
+        <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html">3D Model</a>
+        <a class="top-nav__link" data-route="gemini_chat.html" href="gemini_chat.html" aria-current="page">AI Stylist</a>
+        <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+        <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+      </nav>
+
+      <div class="dash-right">
+        <span class="dash-user" id="username">@user</span>
+      </div>
+    </header>
+
+    <main class="feature-shell">
+      <h1 class="feature-title feature-title--center">AI Style Assistant</h1>
+
+      <!-- We keep the chat UI structure/IDs expected -->
+      <section class="panel" style="max-width: 980px; margin: 0 auto;">
+        <header class="topbar">
+          <div class="brand">
+            <div class="dot" aria-hidden="true"></div>
+            <div class="titles">
+              <div class="name">This is Styleo's Gemini Chat</div>
+              <div class="sub">The local server for this is localhost:3001</div>
+            </div>
+          </div>
+          <button class="ghost" type="button" id="clearBtn">Clear</button>
+        </header>
+
+        <div class="chat" id="chat" aria-live="polite"></div>
+
+        <form class="composer" id="chatForm" autocomplete="off">
+          <div class="inputWrap">
+            <textarea id="input" rows="1" placeholder="Type a message…" aria-label="Message"></textarea>
+            <button class="send" type="submit" id="sendBtn">Send</button>
+          </div>
+          <div class="hint">Enter = send, Shift+Enter = new line</div>
+        </form>
+      </section>
+    </main>
+
+    <!-- Support -->
+    <a class="support-fab keep-user" href="support.html" aria-label="Support">
+      <span class="support-fab__dot">?</span>
+      <span class="support-fab__text">Support</span>
+    </a>
+
+  </div>
+
+  <!-- logic -->
+  <script src="gemini_chat.js"></script>
+
+  <!-- CHATGPT skazal: Keep username query-param behavior from your 2nd HTML (optional, safe) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const user = params.get("user") || "";
+
+      const u = document.getElementById("username");
+      if (u && user) u.textContent = "@" + user;
+
+      if (user) {
+        document.querySelectorAll("a[data-route], a.keep-user").forEach(a => {
+          const url = new URL(a.getAttribute("href"), window.location.origin);
+          url.searchParams.set("user", user);
+          a.setAttribute("href", url.pathname + "?" + url.searchParams.toString());
+        });
+      }
+
+      const current = location.pathname.split("/").pop() || "dashboard.html";
+      document.querySelectorAll("a[data-route]").forEach(a => {
+        if (a.getAttribute("data-route") === current) a.setAttribute("aria-current","page");
+        else a.removeAttribute("aria-current");
+      });
+    });
+  </script>
+
+  <!-- Auth guard inside html -->
+  <script type="module">
+    import { requireAuth } from "./auth_guard.js";
+    requireAuth();
+  </script>
+  <script src="applyTheme.js"></script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="icon" href="images/Logo.jpeg" type="image">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styleo • Outfit Builder</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page-feature">
+<div class="dash">
+
+  <!-- GLOBAL HEADER (same everywhere) -->
+  <header class="dash-header dash-header--nav">
+    <div class="dash-left">
+      <img class="dash-logo" src="images/Logo.jpeg" alt="Styleo Logo" />
+      <span class="dash-brand">Styleo</span>
+    </div>
+
+    <nav class="top-nav" aria-label="Feature navigation">
+      <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+      <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+      <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html" aria-current="page">Outfit Builder</a>
+      <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+      <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html">Wardrobe</a>
+      <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html">3D Model</a>
+      <a class="top-nav__link" data-route="ai-stylist.html" href="ai-stylist.html">AI Stylist</a>
+      <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+      <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+    </nav>
+
+    <div class="dash-right">
+      <span class="dash-user" id="username">@user</span>
+    </div>
+  </header>
+
+  <main class="feature-shell">
+    <h1 class="feature-title feature-title--center">Outfit Builder</h1>
+
+    <section class="ob-grid" aria-label="Outfit builder layout">
+
+      <!-- LEFT: Wardrobe picker -->
+      <aside class="ob-card ob-left">
+        <div class="ob-card__head">
+          <h2 class="ob-card__title">Pick from your wardrobe</h2>
+          <a class="ob-mini-link keep-user" href="wardrobe.html">Open wardrobe →</a>
+        </div>
+
+        <p class="ob-muted">Click items below to add them into the main window (multiple items allowed).</p>
+
+        <div class="ob-wardrobe" id="wardrobeList" aria-label="Wardrobe items">
+          <!-- injected -->
+        </div>
+      </aside>
+
+      <!-- CENTER: Main window -->
+      <section class="ob-card ob-center" aria-label="Selected items">
+        <div class="ob-card__head">
+          <h2 class="ob-card__title">Selected (zoom inside)</h2>
+          <button class="ob-clear" type="button" id="clearSelected">Clear</button>
+        </div>
+
+        <div class="ob-main" id="mainStage" aria-label="Main stage">
+          <div class="ob-main__empty" id="mainEmpty">Pick items from wardrobe to build an outfit</div>
+          <div class="ob-selected" id="selectedStack">
+            <!-- injected -->
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Suggestions -->
+      <aside class="ob-card ob-right" aria-label="Suggestions">
+        <div class="ob-card__head">
+          <h2 class="ob-card__title">Suggestions</h2>
+          <span class="ob-pill">click = open search</span>
+        </div>
+
+        <p class="ob-muted">These are placeholders. Clicking opens Clothes Search.</p>
+
+        <div class="ob-suggestions" id="suggestionsList">
+          <!-- injected -->
+        </div>
+      </aside>
+
+    </section>
+  </main>
+
+  <!-- Support button bottom-left -->
+  <a class="support-fab keep-user" href="support.html" aria-label="Support">
+    <span class="support-fab__dot">?</span>
+    <span class="support-fab__text">Support</span>
+  </a>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const user = params.get("user") || "";
+
+  // username
+  const u = document.getElementById("username");
+  if (u && user) u.textContent = "@" + user;
+
+  // keep ?user=... on nav + support + links
+  if (user) {
+    document.querySelectorAll("a[data-route], a.keep-user").forEach(a => {
+      const url = new URL(a.getAttribute("href"), window.location.origin);
+      url.searchParams.set("user", user);
+      a.setAttribute("href", url.pathname + "?" + url.searchParams.toString());
+    });
+  }
+
+  // highlight current page
+  const current = location.pathname.split("/").pop() || "dashboard.html";
+  document.querySelectorAll("a[data-route]").forEach(a => {
+    const route = a.getAttribute("data-route");
+    if (route === current) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+
+  initOutfitBuilder(user);
+});
+
+function initOutfitBuilder(user){
+  const wardrobeEl = document.getElementById("wardrobeList");
+  const selectedEl = document.getElementById("selectedStack");
+  const emptyEl = document.getElementById("mainEmpty");
+  const clearBtn = document.getElementById("clearSelected");
+  const suggestionsEl = document.getElementById("suggestionsList");
+
+  const K_WARDROBE = "styleo_wardrobe_items_v1";
+  const K_SELECTED = "styleo_outfit_selected_v1";
+
+  // wardrobe items expected: [{id, type, label, img}]
+  const wardrobe = safeParse(localStorage.getItem(K_WARDROBE)) || demoWardrobe();
+  localStorage.setItem(K_WARDROBE, JSON.stringify(wardrobe));
+
+  // selected items: store ids (can repeat? we'll store unique by default)
+  const selectedIds = (safeParse(localStorage.getItem(K_SELECTED)) || []);
+
+  renderWardrobe();
+  renderSelected();
+
+  clearBtn.addEventListener("click", () => {
+    selectedIds.length = 0;
+    localStorage.setItem(K_SELECTED, JSON.stringify(selectedIds));
+    renderSelected();
+  });
+
+  function renderWardrobe(){
+    wardrobeEl.innerHTML = wardrobe.map(item => `
+      <button class="ob-witem" type="button" data-id="${item.id}">
+        <img class="ob-wimg" src="${item.img}" alt="${escapeHTML(item.label)}">
+        <div class="ob-wmeta">
+          <div class="ob-wtype">${escapeHTML(item.type)}</div>
+          <div class="ob-wlabel">${escapeHTML(item.label)}</div>
+        </div>
+      </button>
+    `).join("");
+
+    wardrobeEl.querySelectorAll(".ob-witem").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-id");
+        if (!selectedIds.includes(id)) selectedIds.unshift(id);
+        localStorage.setItem(K_SELECTED, JSON.stringify(selectedIds));
+        renderSelected();
+      });
+    });
+  }
+
+  function renderSelected(){
+    if (!selectedIds.length){
+      emptyEl.style.display = "block";
+      selectedEl.innerHTML = "";
+      return;
+    }
+    emptyEl.style.display = "none";
+
+    const selectedItems = selectedIds
+      .map(id => wardrobe.find(w => w.id === id))
+      .filter(Boolean);
+
+    selectedEl.innerHTML = selectedItems.map(item => `
+      <article class="ob-sel">
+        <div class="ob-zoom">
+          <img class="ob-selimg" src="${item.img}" alt="${escapeHTML(item.label)}">
+        </div>
+        <div class="ob-selinfo">
+          <div class="ob-seltype">${escapeHTML(item.type)}</div>
+          <div class="ob-sellabel">${escapeHTML(item.label)}</div>
+          <button class="ob-remove" type="button" data-id="${item.id}">Remove</button>
+        </div>
+      </article>
+    `).join("");
+
+    selectedEl.querySelectorAll(".ob-remove").forEach(b => {
+      b.addEventListener("click", (e) => {
+        const id = b.getAttribute("data-id");
+        const idx = selectedIds.indexOf(id);
+        if (idx !== -1) selectedIds.splice(idx, 1);
+        localStorage.setItem(K_SELECTED, JSON.stringify(selectedIds));
+        renderSelected();
+      });
+    });
+
+    renderSuggestions(selectedItems);
+  }
+
+  function renderSuggestions(selectedItems){
+    // Very simple placeholder logic:
+    // if no shoes selected => suggest shoes, etc.
+    const hasType = (t) => selectedItems.some(i => i.type.toLowerCase() === t);
+    const sugg = [];
+
+    if (!hasType("tshirt")) sugg.push(suggItem("T-shirt", "images/T-shirt.png", "tshirt"));
+    if (!hasType("hoodie")) sugg.push(suggItem("Hoodie", "images/Hoodie.png", "hoodie"));
+    if (!hasType("pants"))  sugg.push(suggItem("Pants", "images/Pants.png", "pants"));
+    if (!hasType("shoes"))  sugg.push(suggItem("Shoes", "images/Shoes.png", "shoes"));
+
+    // Fill up to 6 cards
+    while (sugg.length < 6) sugg.push(suggItem("Accessory", "images/Accessory.jpg", "accessory"));
+
+    suggestionsEl.innerHTML = sugg.slice(0, 6).map(s => `
+      <button class="ob-sug" type="button" data-q="${escapeHTML(s.q)}">
+        <img class="ob-sugimg" src="${s.img}" alt="${escapeHTML(s.title)}">
+        <div class="ob-sugmeta">
+          <div class="ob-sugtitle">${escapeHTML(s.title)}</div>
+          <div class="ob-sugtype">${escapeHTML(s.q)}</div>
+        </div>
+      </button>
+    `).join("");
+
+    // click suggestion -> open Clothes Search (photo search)
+    suggestionsEl.querySelectorAll(".ob-sug").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const q = btn.getAttribute("data-q") || "";
+        const url = new URL("clothes-search.html", window.location.origin);
+        if (user) url.searchParams.set("user", user);
+        // optional: send query to text search input later
+        url.searchParams.set("prefill", q);
+        window.location.href = url.pathname + "?" + url.searchParams.toString();
+      });
+    });
+  }
+}
+
+function demoWardrobe(){
+  // placeholder wardrobe items (replace with real images from your Wardrobe page)
+  return [
+    { id:"w1", type:"tshirt", label:"Basic tee", img:"images/T-shirt.png" },
+    { id:"w2", type:"hoodie", label:"Green hoodie", img:"images/Hoodie.png" },
+    { id:"w3", type:"pants",  label:"Black pants", img:"images/Pants.png" },
+    { id:"w4", type:"shoes",  label:"Sneakers", img:"images/Shoes.png" },
+    { id:"w5", type:"cap",    label:"Cap", img:"images/Cap.png" },
+    { id:"w6", type:"bag",    label:"Bag", img:"images/Bag.png" }
+  ];
+}
+
+function suggItem(title, img, q){ return { title, img, q }; }
+
+function safeParse(v){ try { return JSON.parse(v); } catch { return null; } }
+function escapeHTML(str){
+  return String(str)
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+</script>
+</body>
+</html>

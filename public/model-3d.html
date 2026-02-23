@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="images/Logo.jpeg" type="image">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styleo • Visual Try-On</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- model-viewer (3D) -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <style>
+    /* Small page-local tweaks so model-viewer fits your layout */
+    .vt-model {
+      width: 100%;
+      height: min(64vh, 620px);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .vt-model model-viewer{
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .vt-toolbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-top:10px;
+    }
+    .vt-mini-btn{
+      padding:8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.05);
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      white-space: nowrap;
+    }
+    .vt-mini-btn:hover{ background: rgba(255,255,255,0.08); }
+    .vt-note{
+      opacity: .75;
+      font-size: 12px;
+    }
+
+    /* Pose scroll */
+    .vt-pose-select{
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      padding:4px 0;
+      max-width: 100%;
+    }
+    .vt-mini-btn.is-on{
+      outline: 2px solid rgba(255,255,255,0.25);
+    }
+  </style>
+</head>
+
+<body class="page-feature">
+<div class="dash">
+
+  <!-- GLOBAL HEADER -->
+  <header class="dash-header dash-header--nav">
+    <div class="dash-left">
+      <img class="dash-logo" src="images/Logo.jpeg" alt="Styleo Logo" />
+      <span class="dash-brand">Styleo</span>
+    </div>
+
+    <nav class="top-nav" aria-label="Feature navigation">
+      <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+      <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+      <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html">Outfit Builder</a>
+      <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+      <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html">Wardrobe</a>
+      <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html" aria-current="page">3D Model</a>
+      <a class="top-nav__link" data-route="gemini_chat.html" href="gemini_chat.html">AI Stylist</a>
+      <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+      <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+    </nav>
+
+    <div class="dash-right">
+      <span class="dash-user" id="username">@user</span>
+    </div>
+  </header>
+
+  <main class="feature-shell">
+    <h1 class="feature-title feature-title--center">Visual Try-On</h1>
+
+    <section class="vt-grid" aria-label="Visual Try-On layout">
+
+      <!-- LEFT: Digital wardrobe -->
+      <aside class="vt-card vt-left">
+        <div class="vt-head">
+          <h2 class="vt-title">Digital wardrobe</h2>
+          <a class="vt-mini keep-user" href="wardrobe.html">Open wardrobe →</a>
+        </div>
+
+        <div class="vt-tabs" role="tablist" aria-label="Categories">
+          <button class="vt-tab is-active" type="button" data-cat="caps" role="tab">Caps</button>
+          <button class="vt-tab" type="button" data-cat="pants" role="tab">Pants</button>
+          <button class="vt-tab" type="button" data-cat="shoes" role="tab">Shoes</button>
+        </div>
+
+        <p class="vt-muted">Click an item to apply it (v1: UI state only).</p>
+
+        <div class="vt-items" id="vtItems"></div>
+      </aside>
+
+      <!-- CENTER: 3D Viewer -->
+      <section class="vt-views" aria-label="Avatar view">
+        <article class="vt-card vt-view">
+          <div class="vt-head">
+            <h2 class="vt-title">3D Avatar</h2>
+            <span class="vt-badge">rotate + zoom</span>
+          </div>
+
+          <div class="vt-model">
+            <model-viewer
+              id="avatarViewer"
+              src="./models/avatar_pose_0_clothes_0.glb"
+              camera-controls
+              touch-action="pan-y"
+              shadow-intensity="1"
+              exposure="1"
+              environment-image="neutral"
+              ar
+              autoplay
+            ></model-viewer>
+          </div>
+
+          <div class="vt-toolbar">
+            <div class="vt-note" id="appliedNote">Applied: none</div>
+            <div style="display:flex; gap:10px;">
+              <button class="vt-mini-btn" type="button" id="toggleRotate">Toggle auto-rotate</button>
+              <button class="vt-mini-btn" type="button" id="resetCam">Reset view</button>
+            </div>
+          </div>
+
+          <div class="vt-toolbar" style="margin-top:12px;">
+            <div class="vt-note">Pose</div>
+            <div class="vt-pose-select">
+              <button class="vt-mini-btn" type="button" data-pose="0">Pose 1</button>
+              <button class="vt-mini-btn" type="button" data-pose="1">Pose 2</button>
+              <button class="vt-mini-btn" type="button" data-pose="2">Pose 3</button>
+            </div>
+          </div>
+
+        </article>
+      </section>
+
+    </section>
+  </main>
+
+  <!-- Support -->
+  <a class="support-fab keep-user" href="support.html" aria-label="Support">
+    <span class="support-fab__dot">?</span>
+    <span class="support-fab__text">Support</span>
+  </a>
+
+</div>
+
+<script>
+/** Map: pose (0..2) x clothes (0/1) -> model path */
+const MODEL_MAP = {
+  0: { 0: "./models/avatar_pose_0_clothes_0.glb", 1: "./models/avatar_pose_0_clothes_1.glb" },
+  1: { 0: "./models/avatar_pose_1_clothes_0.glb", 1: "./models/avatar_pose_1_clothes_1.glb" },
+  2: { 0: "./models/avatar_pose_2_clothes_0.glb", 1: "./models/avatar_pose_2_clothes_1.glb" },
+};
+
+// persistent settings
+const K_POSE = "styleo_tryon_pose_v1";       // "0"|"1"|"2"
+const K_CAP_BLACK = "styleo_cap_black_v1";   // "0"|"1"
+
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const user = params.get("user") || "";
+
+  // username
+  const u = document.getElementById("username");
+  if (u && user) u.textContent = "@" + user;
+
+  // keep ?user=... on nav + support + any keep-user links
+  if (user) {
+    document.querySelectorAll("a[data-route], a.keep-user").forEach(a => {
+      const url = new URL(a.getAttribute("href"), window.location.origin);
+      url.searchParams.set("user", user);
+      a.setAttribute("href", url.pathname + "?" + url.searchParams.toString());
+    });
+  }
+
+  // highlight current
+  const current = location.pathname.split("/").pop() || "dashboard.html";
+  document.querySelectorAll("a[data-route]").forEach(a => {
+    if (a.getAttribute("data-route") === current) a.setAttribute("aria-current","page");
+    else a.removeAttribute("aria-current");
+  });
+
+  // IMPORTANT: viewer first (exposes applyModel function), then try-on
+  initViewerControls();
+  initTryOn();
+});
+
+function initViewerControls(){
+  const viewer = document.getElementById("avatarViewer");
+  const toggleBtn = document.getElementById("toggleRotate");
+  const resetBtn = document.getElementById("resetCam");
+
+  // start with auto-rotate ON (optional)
+  viewer.setAttribute("auto-rotate", "");
+  viewer.setAttribute("rotation-per-second", "20deg");
+
+  toggleBtn.addEventListener("click", () => {
+    if (viewer.hasAttribute("auto-rotate")) viewer.removeAttribute("auto-rotate");
+    else viewer.setAttribute("auto-rotate", "");
+  });
+
+  resetBtn.addEventListener("click", () => {
+    viewer.cameraOrbit = "0deg 75deg 2.5m";
+    viewer.fieldOfView = "30deg";
+  });
+
+  // Pose buttons
+  const poseWrap = document.querySelector(".vt-pose-select");
+  const poseBtns = poseWrap ? poseWrap.querySelectorAll("[data-pose]") : [];
+
+  function getPose() {
+    const p = parseInt(localStorage.getItem(K_POSE) || "0", 10);
+    return Number.isFinite(p) ? Math.max(0, Math.min(2, p)) : 0;
+  }
+  function getCapBlackOn() {
+    return localStorage.getItem(K_CAP_BLACK) === "1";
+  }
+
+  function setPoseUI(p){
+    poseBtns.forEach(b => b.classList.toggle("is-on", b.getAttribute("data-pose") === String(p)));
+  }
+
+  function applyModel(){
+    const pose = getPose();
+    const clothes = getCapBlackOn() ? 1 : 0;
+    const src = MODEL_MAP?.[pose]?.[clothes];
+    if (!src) {
+      console.warn("Missing model for pose/clothes", pose, clothes);
+      return;
+    }
+    viewer.setAttribute("src", src);
+  }
+
+  // init pose UI + model
+  const initialPose = getPose();
+  setPoseUI(initialPose);
+  applyModel();
+
+  poseBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const p = parseInt(btn.getAttribute("data-pose"), 10);
+      localStorage.setItem(K_POSE, String(p));
+      setPoseUI(p);
+      applyModel();
+    });
+  });
+
+  // expose for try-on handlers
+  window.__applyTryOnModel = applyModel;
+}
+
+function initTryOn(){
+  const itemsEl = document.getElementById("vtItems");
+  const appliedNote = document.getElementById("appliedNote");
+
+  //frontend
+  const K_APPLIED = "styleo_tryon_applied_v1";
+  const applied = safeParse(localStorage.getItem(K_APPLIED)) || { caps:null, pants:null, shoes:null };
+
+  // demo wardrobe 
+  const catalog = {
+    caps: [
+      { id:"cap1", name:"Cap • Beige", img:"images/cap-1.webp" },
+      { id:"cap2", name:"Cap • Black", img:"images/cap-2.webp" },
+      { id:"cap3", name:"Cap • Green", img:"images/cap-3.webp" },
+    ],
+    pants: [
+      { id:"pants1", name:"Pants • Black", img:"images/pants-1.jpg" },
+      { id:"pants2", name:"Pants • Cargo", img:"images/pants-2.jpg" },
+      { id:"pants3", name:"Pants • Jeans", img:"images/pants-3.jpg" },
+    ],
+    shoes: [
+      { id:"shoes1", name:"Shoes • Sneakers", img:"images/shoes-1.jpg" },
+      { id:"shoes2", name:"Shoes • White", img:"images/shoes-2.jpg" },
+      { id:"shoes3", name:"Shoes • Boots", img:"images/shoes-3.jpg" },
+    ]
+  };
+
+  // cap black state when you switch to the other poses
+  localStorage.setItem(K_CAP_BLACK, (applied.caps === "cap2") ? "1" : "0");
+  if (typeof window.__applyTryOnModel === "function") window.__applyTryOnModel();
+
+  // tabs
+  let activeCat = "caps";
+  document.querySelectorAll(".vt-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".vt-tab").forEach(x => x.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      activeCat = btn.getAttribute("data-cat");
+      renderItems();
+    });
+  });
+
+  renderItems();
+  renderAppliedText();
+
+  function renderItems(){
+    const list = catalog[activeCat] || [];
+    itemsEl.innerHTML = list.map(it => {
+      const isOn = applied[activeCat] === it.id;
+      return `
+        <button class="vt-item ${isOn ? "is-on" : ""}" type="button" data-id="${it.id}">
+          <img class="vt-item__img" src="${it.img}" alt="${escapeHTML(it.name)}">
+          <div class="vt-item__meta">
+            <div class="vt-item__name">${escapeHTML(it.name)}</div>
+            <div class="vt-item__hint">${isOn ? "Applied" : "Click to apply"}</div>
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    itemsEl.querySelectorAll(".vt-item").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-id");
+
+        // toggle everything
+        applied[activeCat] = (applied[activeCat] === id) ? null : id;
+        localStorage.setItem(K_APPLIED, JSON.stringify(applied));
+
+        // CLOTHES_1 ===== CAP. BLACK CAP.
+        if (activeCat === "caps") {
+          const capBlackOn = (applied.caps === "cap2");
+          localStorage.setItem(K_CAP_BLACK, capBlackOn ? "1" : "0");
+          if (typeof window.__applyTryOnModel === "function") window.__applyTryOnModel();
+        }
+
+        renderItems();
+        renderAppliedText();
+      });
+    });
+  }
+
+  function renderAppliedText(){
+    const cap = findById(catalog.caps, applied.caps);
+    const pants = findById(catalog.pants, applied.pants);
+    const shoes = findById(catalog.shoes, applied.shoes);
+
+    const parts = [];
+    if (cap) parts.push(`Cap: ${cap.name}`);
+    if (pants) parts.push(`Pants: ${pants.name}`);
+    if (shoes) parts.push(`Shoes: ${shoes.name}`);
+
+    appliedNote.textContent = parts.length ? ("Applied: " + parts.join(" • ")) : "Applied: none";
+  }
+
+  function findById(arr, id){
+    if (!id) return null;
+    return (arr || []).find(x => x.id === id) || null;
+  }
+}
+
+function safeParse(v){ try { return JSON.parse(v); } catch { return null; } }
+function escapeHTML(str){
+  return String(str)
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+</script>
+<script src="applyTheme.js"></script>
+</body>
+</html>

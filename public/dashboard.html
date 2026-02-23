@@ -1,0 +1,198 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="icon" href="images/Logo.jpeg" type="image">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styleo • Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page-dashboard">
+  <div class="dash">
+
+   <header class="dash-header dash-header--nav">
+  <div class="dash-left">
+    <img class="dash-logo" src="images/Logo.jpeg" alt="Styleo Logo" />
+    <span class="dash-brand">Styleo</span>
+    <button id="logoutBtn">Logout</button>
+    
+  </div>
+
+  <!-- NAVIGACII -->
+  <nav class="top-nav" aria-label="Feature navigation">
+    <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+
+    <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+    <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html">Outfit Builder</a>
+    <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+    <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html">Wardrobe</a>
+    <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html">3D Model</a>
+    <a class="top-nav__link" data-route="gemini_chat.html" href="gemini_chat.html">AI Stylist</a>
+    <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+
+    <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+  </nav>
+
+    <img class="default_photo" src="images/default_photo.webp" alt="Profile">
+  <div class="dash-right">
+    <span class="dash-user" id="username">@user</span>
+  </div>
+</header>
+      <!-- Аманжан 
+      Добавь сюда короче 
+      Я тебе в ватсапп скидывал то что надо
+      п
+      пп
+      пппп
+      -->
+
+
+    <section class="dash-hero" aria-label="Slogan">
+      <h1 class="dash-slogan">Your style hub — pick a feature</h1>
+    </section>
+
+    <main class="dash-main" aria-label="Features">
+
+      <!-- ne pomnu -->
+      <section class="dash-row dash-row-4" aria-label="Top features">
+
+        <!-- 1) Account -->
+        <div class="feature-wrap">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <a class="feature-card" href="login.html" aria-label="Open Account">
+            <img class="feature-img" src="images/Account.jpeg" alt="Account feature" />
+          </a>
+          <aside class="feature-pop" role="dialog" aria-label="Account details">
+            <h3>Account</h3>
+            <p>Register, log in, and keep your profile saved (Firebase-ready).</p>
+          </aside>
+        </div>
+
+        <!-- 2) Photo Search -->
+        <div class="feature-wrap">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <a class="feature-card" href="clothes-search.html" aria-label="Open Photo Search">
+  
+            <img class="feature-img" src="images/Clothes Search.jpeg" alt="Photo and text Search feature" />
+          </a>
+          <aside class="feature-pop" role="dialog" aria-label="Photo Search details">
+            <h3>Photo Search</h3>
+            <p>Upload an image, get item name/type + shop links (placeholder AI).</p>
+          </aside>
+        </div>
+
+        <!-- 3) Outfit Builder -->
+        <div class="feature-wrap">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <a class="feature-card" href="outfit-builder.html" aria-label="Open Outfit Builder">
+  
+            <img class="feature-img" src="images/Outfit Builder.jpeg" alt="Outfit Builder feature" />
+          </a>
+          <aside class="feature-pop" role="dialog" aria-label="Outfit Builder details">
+            <h3>Outfit Builder</h3>
+            <p>Generate outfits by prompt/name. Options: accessories, hats, hoodies, height, weight.</p>
+          </aside>
+        </div>
+
+        <!-- 4) Promo Codes -->
+        <div class="feature-wrap">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <a class="feature-card" href="promo-codes.html" aria-label="Open Promo Codes">
+  
+            <img class="feature-img" src="images/Promo Codes.jpeg" alt="Promo Codes feature" />
+          </a>
+          <aside class="feature-pop" role="dialog" aria-label="Promo Codes details">
+            <h3>Promo Codes</h3>
+            <p>Honey-like promo codes per specific website. Simple and safe suggestions.</p>
+          </aside>
+        </div>
+
+      </section>
+
+      <!-- BOTTOM ROW: HERE HERE-->
+      <section class="dash-row dash-row-4" aria-label="More features">
+
+        <!-- 5) Digital Wardrobe -->
+        <div class="feature-wrap">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <a class="feature-card" href="wardrobe.html" aria-label="Open Digital Wardrobe">
+  
+            <img class="feature-img" src="images/Digital Wardrobe.jpeg" alt="Digital Wardrobe feature" />
+          </a>
+          <aside class="feature-pop" role="dialog" aria-label="Digital Wardrobe details">
+            <h3>Digital Wardrobe</h3>
+            <p>Upload clothes + REQUIRED tags: type, color, season, style. Base for personalization.</p>
+          </aside>
+        </div>
+
+        <!-- 6) 3D Model -->
+        <div class="feature-wrap">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <a class="feature-card" href="model-3d.html" aria-label="Open 3D Model">
+        
+            <img class="feature-img" src="images/3D Model.jpeg" alt="3D Model feature" />
+          </a>
+          <aside class="feature-pop" role="dialog" aria-label="3D Model details">
+            <h3>3D Model</h3>
+            <p>Choose model (age/height/skin tone) and preview outfits visually (placeholder).</p>
+          </aside>
+        </div>
+
+        <!-- 7) AI Stylist Chat ?-->
+        <div class="feature-wrap">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <a class="feature-card" href="gemini_chat.html" aria-label="Open AI Stylist Chat">
+           
+            <img class="feature-img" src="images/Ai Stylist Chat.jpeg" alt="AI Stylist Chat feature" />
+          </a>
+          <aside class="feature-pop" role="dialog" aria-label="AI Stylist Chat details">
+            <h3>AI Stylist Chat</h3>
+            <p>Chat UI where the stylist adapts to your preferences (V1).</p>
+          </aside>
+        </div>
+
+        <!-- 8) Trends 2026 -->
+        <div class="feature-wrap">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <a class="feature-card" href="trends.html" aria-label="Open Trends 2026">
+        
+            <img class="feature-img" src="images/Trends 2026.jpeg" alt="Trends 2026 feature" />
+          </a>
+          <aside class="feature-pop" role="dialog" aria-label="Trends 2026 details">
+            <h3>Trends 2026</h3>
+            <p>Trending looks with clickable items + buy links for every piece.</p>
+          </aside>
+        </div>
+
+      </section>
+
+    </main>
+
+    <a class="support-fab" href="support.html" aria-label="Support">
+      <span class="support-fab__dot">?</span>
+      <span class="support-fab__text">Support</span>
+    </a>
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const user = params.get("user");
+      const el = document.getElementById("username");
+      if (user && el) el.textContent = "@" + user;
+    });
+  </script>
+
+  <script type="module" src="./dashboard.js"></script>
+
+<script src="applyTheme.js"></script></body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="icon" href="images/Logo.jpeg" type="image">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styleo • Clothes Search Results</title>
+
+  <!-- монтессрат ? -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page-search-results">
+<div class="dash">
+
+  <!-- ===== наш HEADER  ===== -->
+  <header class="dash-header dash-header--nav">
+    <div class="dash-left">
+      <img class="dash-logo" src="images/Logo.jpeg" alt="Styleo Logo" />
+      <span class="dash-brand">Styleo</span>
+    </div>
+
+    <nav class="top-nav" aria-label="Feature navigation">
+      <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+      <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+      <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html">Outfit Builder</a>
+      <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+      <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html">Wardrobe</a>
+      <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html">3D Model</a>
+      <a class="top-nav__link" data-route="gemini_chat.html" href="gemini_chat.html">AI Stylist</a>
+      <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+      <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+    </nav>
+
+    <div class="dash-right">
+      <span class="dash-user" id="username">@user</span>
+    </div>
+  </header>
+
+  <!-- ===== ТАЙТЛ ===== -->
+  <section class="dash-hero">
+    <h1 class="dash-slogan">Clothes search results</h1>
+  </section>
+
+  <!-- RESULTS  -->
+  <main class="dash-main">
+    <section class="results-grid">
+
+      <!-- карточка  -->
+      <a class="result-card" href="https://example.com/item1" target="_blank">
+        <img src="images/result-1.jpg" alt="Result item">
+        <span class="result-link">View item</span>
+      </a>
+
+      <a class="result-card" href="https://example.com/item2" target="_blank">
+        <img src="images/result-2.jpg" alt="Result item">
+        <span class="result-link">View item</span>
+      </a>
+
+      <a class="result-card" href="https://example.com/item3" target="_blank">
+        <img src="images/result-3.jpg" alt="Result item">
+        <span class="result-link">View item</span>
+      </a>
+
+      <a class="result-card" href="https://example.com/item4" target="_blank">
+        <img src="images/result-4.jpg" alt="Result item">
+        <span class="result-link">View item</span>
+      </a>
+
+      <!-- просто копируешь карточки ниже  будет новый ряд -->
+    </section>
+  </main>
+
+  <!-- ===== SUPPORT BUTTON! ===== -->
+  <a class="support-fab" href="support.html">
+    <span class="support-fab__dot">?</span>
+    <span class="support-fab__text">Support</span>
+  </a>
+
+</div>
+
+<!-- че за хрень аманжан это? -->
+ <!-- гори в аду -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const user = params.get("user");
+
+    const el = document.getElementById("username");
+    if (el && user) el.textContent = "@" + user;
+
+    if (user) {
+      document.querySelectorAll("a[data-route]").forEach(a => {
+        const url = new URL(a.getAttribute("href"), window.location.origin);
+        url.searchParams.set("user", user);
+        a.setAttribute("href", url.pathname + "?" + url.searchParams.toString());
+      });
+    }
+
+    const current = location.pathname.split("/").pop();
+    document.querySelectorAll("a[data-route]").forEach(a => {
+      if (a.getAttribute("data-route") === current) {
+        a.setAttribute("aria-current", "page");
+      }
+    });
+  });
+</script>
+
+<script src="applyTheme.js"></script></body>
+</html>

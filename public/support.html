@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="icon" href="images/Logo.jpeg" type="image">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styleo • Support</title>
+
+  <!-- Inter -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" 
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page-support">
+  <div class="dash support-page">
+    <!-- Header -->
+ <header class="dash-header dash-header--nav">
+  <div class="dash-left">
+    <img class="dash-logo" src="images/Logo.jpeg" alt="Styleo Logo" />
+    <span class="dash-brand">Styleo</span>
+  </div>
+
+  <!-- NAV (центр) -->
+  <nav class="top-nav" aria-label="Feature navigation">
+    <a class="top-nav__link" data-route="dashboard.html" href="dashboard.html">Dashboard</a>
+
+    <a class="top-nav__link" data-route="clothes-search.html" href="clothes-search.html">Clothes Search</a>
+    <a class="top-nav__link" data-route="outfit-builder.html" href="outfit-builder.html">Outfit Builder</a>
+    <a class="top-nav__link" data-route="promo-codes.html" href="promo-codes.html">Promo Codes</a>
+    <a class="top-nav__link" data-route="wardrobe.html" href="wardrobe.html">Wardrobe</a>
+    <a class="top-nav__link" data-route="model-3d.html" href="model-3d.html">3D Model</a>
+    <a class="top-nav__link" data-route="gemini_chat.html" href="gemini_chat.html">AI Stylist</a>
+    <a class="top-nav__link" data-route="trends.html" href="trends.html">Trends</a>
+
+    <a class="top-nav__link" data-route="support.html" href="support.html">Support</a>
+  </nav>
+
+  <div class="dash-right">
+    <span class="dash-user" id="username">@user</span>
+  </div>
+</header>
+
+<main class="support-wrap">
+  <h1 class="support-h1">Support</h1>
+
+  <!-- CARD 1: FAQ -->
+  <section class="support-card support-card-faq">
+    <h2 class="support-card-title">FAQ</h2>
+
+    <div class="faq">
+      <!-- hidden radios -->
+      <input class="faq-radio" type="radio" name="faq" id="faq1" checked>
+      <input class="faq-radio" type="radio" name="faq" id="faq2">
+      <input class="faq-radio" type="radio" name="faq" id="faq3">
+      <input class="faq-radio" type="radio" name="faq" id="faq4">
+
+      <div class="faq-qs">
+        <label class="faq-q" for="faq1"><span>How does Styleo work?</span><span class="faq-plus">+</span></label>
+        <label class="faq-q" for="faq2"><span>How do I upload clothes?</span><span class="faq-plus">+</span></label>
+        <label class="faq-q" for="faq3"><span>Do you save my data?</span><span class="faq-plus">+</span></label>
+        <label class="faq-q" for="faq4"><span>Where do I find promo codes?</span><span class="faq-plus">+</span></label>
+      </div>
+
+      <div class="faq-ans">
+        <div class="faq-a faq-a1">
+          <h3>How does Styleo work?</h3>
+          <p>Upload items, tag them, and Styleo will help you assemble outfits and discover matching pieces online.</p>
+        </div>
+        <div class="faq-a faq-a2">
+          <h3>How do I upload clothes?</h3>
+          <p>Go to Digital Wardrobe → Add item → upload photo and set required tags (category, color, season).</p>
+        </div>
+        <div class="faq-a faq-a3">
+          <h3>Do you save my data?</h3>
+          <p>Your profile and wardrobe are saved to your account. Only you can access your data.</p>
+        </div>
+        <div class="faq-a faq-a4">
+          <h3>Where do I find promo codes?</h3>
+          <p>Open Promo Codes page → choose a store → get available codes and apply them at checkout.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARD 2: CONTACT -->
+  <section class="support-card support-card-contact">
+    <h2 class="support-card-title">Contact</h2>
+
+    <div class="contact-tiles">
+      <div class="contact-tile">
+        <span class="contact-k">Email</span>
+        <span class="contact-v">styleo.team@email.com</span>
+      </div>
+
+      <div class="contact-tile">
+        <span class="contact-k">Instagram</span>
+        <span class="contact-v">@styleo</span>
+      </div>
+
+      <div class="contact-tile">
+        <span class="contact-k">Office</span>
+        <span class="contact-v">Hussein Ben Talal 19</span>
+      </div>
+    </div>
+
+    <p class="contact-note">We reply within 24 hours.</p>
+    <a class="contact-note" href="color_wheel.html">
+    
+  Change Color Scheme
+</a>
+    <a class="btn btn-outline support-back" href="developer.html">Developer</a>
+    <a class="btn btn-outline support-back" href="dashboard.html">
+      ← Back to Dashboard</a>
+  </section>
+</main>
+
+  </div>
+
+  <!-- Username from URL: support.html?user=NAME -->
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const user = params.get("user");
+    if (user) document.getElementById("username").textContent = "@" + user;
+  </script>
+<script src="applyTheme.js"></script>
+</body>
+</html>
